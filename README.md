@@ -6,8 +6,9 @@ Aplikasi iOS To Do List adalah sebuah aplikasi CRUD sederhana berbasis iOS yang 
 
 ### Build With:
 
-* [Swift](https://getbootstrap.com)
-* [Core Data](https://jquery.com)
+* [Swift](https://www.swift.org/documentation/)
+* [Xcode](https://developer.apple.com/xcode/)
+* [Core Data (Local Database)](https://developer.apple.com/documentation/coredata)
 
 
 <!-- How to Install -->
