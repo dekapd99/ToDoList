@@ -17,11 +17,12 @@ Untuk menggunakan repositori ini, ikutilah petunjuk penggunaan berikut dan pasti
 
 1. Lakukan download .zip atau `clone` repositori dengan cara:
 ```bash
-git clone https://github.com/dekapd99/redesign-ittama.git
+git clone https://github.com/dekapd99/ToDoList.git
 ```
 
 2. Jika mendownload .zip, Extract zip tersebut dan Jalankan file dengan ekstensi .html menggunakan browser atau live server.
-
+3. Jika sudah silahkan buka Project di Xcode
+4. Build & Run
 
 <!-- What Kind of License? -->
 ## License
