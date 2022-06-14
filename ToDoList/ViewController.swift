@@ -7,13 +7,13 @@
 
 import UIKit
 
-// Library UI yang digunakan TableViewDelegate dan TableViewDataSource
+// Tampilan Beranda Aplikasi
 class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSource {
 
-    // Buat context dengan AppDelegate dan cast context ke persistentContainer (database)
+    // Cast context melalui AppDelegate ke persistentContainer (database)
     let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
     
-    // Buat Tabel dengan UITableView
+    // Tabel dengan UITableView
     let tableView: UITableView = {
         let table = UITableView()
         table.register(UITableViewCell.self, forCellReuseIdentifier: "cell")
@@ -21,8 +21,9 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
         return table
     }()
     
-    private var models = [ToDoListItem]() // models yang berisikan List Item (Task) dalam bentuk array
+    private var models = [ToDoListItem]() // Model List Item (Task) dalam bentuk array
     
+    // Load Tampilan Beranda
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -33,154 +34,136 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
         tableView.dataSource = self
         tableView.frame = view.bounds
         
-        // Tombol + dengan fungsi dalam bentuk Selector Object (@objc)
+        // Tombol Add Task (+) dengan fungsi dalam bentuk Selector Object (@objc)
         navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(didTapAdd))
     }
     
-    // Custom Pop Up Alert -> Klik + -> Muncul Pop Up -> Isi Task -> Submit
+    // Custom Pop Up Alert => Klik + -> Muncul Pop Up -> Isi Task -> Submit
     @objc private func didTapAdd(){
 
-        // Forms
-        let alert = UIAlertController(title: "New Item", message: "Enter New Item", preferredStyle: .alert)
+        // Forms Task Baru
+        let alert = UIAlertController(title: "Task Baru", message: "Masukkan Task Baru", preferredStyle: .alert)
         alert.addTextField(configurationHandler: nil)
         
-        // Tombol Submit ketika ditekan akan close pop up
+        // Task Forms Handler: Jika ada input maka tambahkan task tersebut, Jika kosong maka tidak akan ditambahkan
         // [weak self] Memory Leak Handler
-        // Guard untuk menghandle pengisian
-        // Jika diisi maka akan ada task baru & jika kosong maka tidak akan ada task baru
         alert.addAction(UIAlertAction(title: "Submit", style: .cancel, handler: { [weak self] _ in
             guard let field = alert.textFields?.first, let text = field.text, !text.isEmpty else{
                 return
             }
-            
-            // buat task baru
-            self?.createItem(name: text)
-            
+            self?.createItem(name: text) // Buat task dari Input String Nama (optional)
         }))
-        
-        // Animasi Pop Up Alert
-        present(alert, animated: true)
+        present(alert, animated: true) // Pop Up Forms (animasi)
     }
     
-    // Fungsi untuk menghitung dan menampilkan banyaknya task yang muncul berdasarkan database
+    // Fungsi untuk menampilkan banyaknya task yang muncul berdasarkan isi database
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return models.count
     }
     
-    // Menampilkan hasil item (task) yang di input ke dalam cell
+    // Menampilkan Task yang tersimpan ke dalam Baris Cell (satuan)
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let model = models[indexPath.row]
         let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath)
         cell.textLabel?.text = model.name
         
-        // Pengecekan tanggal dan waktu dibuatnya task
-        //        cell.textLabel?.text = "\(model.name) - \(model.createdAt)"
+//      // Pengecekan tanggal dan waktu dibuatnya task (uncomment)
+        // cell.textLabel?.text = "\(model.name) - \(model.createdAt)"
         
         return cell
     }
     
-    // Fungsi edit item (Task) = klik item -> edit -> pop up form editable -> simpan
+    // Fungsi Edit Task => klik item -> edit -> pop up form editable -> simpan
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
         let item = models[indexPath.row]
         
-        // memunculkan ActionSheet Edit dibawah ketika memilih salah satu item (task)
+        // ActionSheet Edit dibawah ketika memilih salah satu item (task)
         let sheet = UIAlertController(title: "Edit", message: nil, preferredStyle: .actionSheet)
         
-        // memunculkan ActionSheet Cancel dibawah ketika memilih salah satu item (task)
+        // ActionSheet Cancel dibawah ketika memilih salah satu item (task)
         sheet.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
         
-        // pop up Editable Item (Task) dalam bentuk form
+        // Pop up Editable Task dalam bentuk Form
         sheet.addAction(UIAlertAction(title: "Edit", style: .default, handler: { _ in
-            let alert = UIAlertController(title: "Edit Item", message: "Edit Your Item", preferredStyle: .alert)
+            let alert = UIAlertController(title: "Edit Task", message: "Edit Your Task", preferredStyle: .alert)
             alert.addTextField(configurationHandler: nil)
             alert.textFields?.first?.text = item.name // menampilkan item (task) sebelumnya
             
-            // Tombol Submit ketika ditekan akan close pop up
+            // Update Forms Handler: Jika ada input baru maka akan ada Task akan Terupdate, jika tidak diubah maka tidak akan terupdate
             // [weak self] Memory Leak Handler
-            // Guard untuk menghandle pengisian
-            // Jika diisi maka akan ada task baru & jika kosong maka tidak akan ada task baru
             alert.addAction(UIAlertAction(title: "Save", style: .cancel, handler: { [weak self] _ in
                 guard let field = alert.textFields?.first, let newName = field.text, !newName.isEmpty else{
                     return
                 }
-                
-                self?.updateItem(item: item, newName: newName) // update edited item (task)
-                
+                self?.updateItem(item: item, newName: newName) // Update edited Task
             }))
-            
-            // Animasi Pop Up Alert
-            self.present(alert, animated: true)
+            self.present(alert, animated: true) // Pop Up Forms (animasi)
         }))
         
-        // memunculkan ActionSheet Delete dibawah ketika memilih salah satu item (task)
+        // ActionSheet Delete dibawah ketika memilih salah satu Task
         sheet.addAction(UIAlertAction(title: "Delete", style: .destructive, handler: { [weak self] _ in
-            self?.deleteItem(item: item) // delete item yang dipilih
+            self?.deleteItem(item: item) // Delete item yang dipilih dari Database
         }))
-        
-        // Animasi Pop Up Alert
-        present(sheet, animated: true)
+        present(sheet, animated: true) // Pop Up Delete (animasi)
     }
 
-    // Core Data
-    // Get All Items (Task) = fetch item dari database -> reload seluruh data secara Async
+    // Fungsi Core Data
+    // Fungsi Get All Items (Task) = fetch item dari database -> reload seluruh data secara di Main Thread
     func getAllItems(){
-        
-        // Harus menggunakan Do {Try & Catch} untuk bisa mengeksekusi pemanggilan method fetch
+        // Do & Catch untuk mengeksekusi hasil Fetch Data di Main Thread
         do{
             models = try context.fetch(ToDoListItem.fetchRequest())
-            
-            // Async -> karena perintah reload data harus berjalan di Main Thread agar tetap tersimpan
-            DispatchQueue.main.async {
+            DispatchQueue.main.async { // Reload hasil Fetch di Main Thread
                 self.tableView.reloadData() // built-in method reloadData()
             }
         }
         catch{
-            // error handling
+            print("Gagal Menampilkan Task. Silahkan Coba Lagi") // Tampilkan error jika gagal mengeksekusi di Main Thread
         }
     }
     
-    // Create Item (Task) = Var penampung item baru (konteks) -> tulis judul item -> simpan waktu pembuatan item
+    // Fungsi Create Task  = Var penampung item baru -> tulis nama item -> simpan waktu pembuatan item
     func createItem(name: String){
         let newItem = ToDoListItem(context: context)
         newItem.name = name
         newItem.createdAt = Date() // built-in method Date()
         
-        // Harus menggunakan Do {Try & Catch} untuk bisa mengeksekusi pemanggilan method save
+        // Do & Catch untuk menyimpan Task Baru di Main Thread
         do{
             try context.save() // built-in method save
-            getAllItems() // Reload Data
+            getAllItems() // Tampilkan seluruh Task (termasuk yang terbaru)
         }
         catch{
-            // error handling
+            print("Gagal Membuat Task. Silahkan Coba Lagi") // Tampilkan error jika gagal mengeksekusi di Main Thread
         }
     }
     
-    // Delete Item (Task) = Delete Item -> Simpan ke Database -> Reload data setelah di Delete
+    // Fungsi Delete Task = Delete Item -> Simpan ke Database -> Reload data setelah di Delete
     func deleteItem(item: ToDoListItem){
         context.delete(item) // built-in method delete
-        
-        // Harus menggunakan Do {Try & Catch} untuk bisa mengeksekusi pemanggilan method save
+
+        // Do & Catch untuk menghapus salah satu Task di Main Thread
         do{
             try context.save() // built-in method save
-            getAllItems() // Reload Data
+            getAllItems() // Tampilkan seluruh Task (termasuk hasil baru setelah ada Task yang baru dihapus)
         }
         catch{
-            // error handling
+            print("Gagal Menghapus Task. Silahkan Coba Lagi") // Tampilkan error jika gagal mengeksekusi di Main Thread
         }
     }
     
-    // Update Item (Task) = Update Nama Task -> Simpan ke Database -> Reload data setelah di Update
+    // Update Task = Update Nama Task -> Simpan ke Database -> Reload data setelah di Update
     func updateItem(item: ToDoListItem, newName: String){
-        item.name = newName
+        item.name = newName // Get nama Task yang baru di Update
         
-        // Harus menggunakan Do {Try & Catch} untuk bisa mengeksekusi pemanggilan method save
+        // Do & Catch untuk update salah satu Task di Main Thread
         do{
             try context.save() // built-in method save
-            getAllItems() // Reload Data
+            getAllItems() // Tampilkan seluruh Task (termasuk hasil baru setelah ada Task yang baru diupdate)
         }
         catch{
-            // error handling
+            print("Gagal Update Task. Silahkan Coba Lagi") // Tampilkan error jika gagal mengeksekusi di Main Thread
         }
     }
     
