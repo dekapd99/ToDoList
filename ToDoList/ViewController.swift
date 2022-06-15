@@ -27,7 +27,7 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        title = "CoreData To Do List" // Judul Halaman
+        title = "To Do List" // Judul Halaman
         view.addSubview(tableView)
         getAllItems()
         tableView.delegate = self
