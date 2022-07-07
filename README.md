@@ -53,6 +53,6 @@ git clone https://github.com/dekapd99/ToDoList.git
 
 <!-- What Kind of License? -->
 ## License
-No License 
+MIT License: Copyright (c) 2022 DK
 
 <p align="right">(<a href="#top">back to top</a>)</p>
