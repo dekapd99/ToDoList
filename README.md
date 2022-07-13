@@ -1,9 +1,9 @@
-# ToDoList
 <!-- ABOUT THE PROJECT -->
 <p align="center">
   <a href="#" target="_blank"><img src="todo list.png" width="200"></a>
 </p>
 
+# ToDoList
 Aplikasi iOS ToDoList adalah sebuah aplikasi CRUD sederhana berbasis iOS yang digunakan untuk membuat sebuah list item. Aplikasi ini dibuat menggunakan TableView (Row), ActionSheet, Alert, dan Core Data (sebagai local database). Pengguna dapat membuat list item, membaca list item yang telah dibuat, mengubah list item yang telah dibuat, dan menghapus item yang telah dibuat.
 
 ## Preview
